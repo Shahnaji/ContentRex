@@ -1,0 +1,28 @@
+# Supabase functions (deploy separately to Supabase)
+src/supabase/
+
+# Development files
+*.md
+src/**/*.md
+src/tmp/
+src/guidelines/
+
+# Environment files (use Vercel environment variables instead)
+.env
+.env.local
+.env.*.local
+
+# Build artifacts (keep dist/ - Vercel needs it!)
+build/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+

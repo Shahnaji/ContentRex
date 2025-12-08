@@ -1,0 +1,72 @@
+    // Get SERP data from DataForSEO (intent, top 10 URLs, LSI keywords, patterns)
+    const serpData = await getSERPData(keywordForAPI, country || 'WW', dataForSeoEmail, dataForSeoPassword);
+
+    // Helper function to generate content with OpenAI
+    const generateWithOpenAI = async (systemPrompt: string, userPrompt: string) => {
+      const response = await fetch("https://api.openai.com/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${openaiApiKey}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "gpt-4o",
+          messages: [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: userPrompt }
+          ],
+          temperature: 0.7,
+          max_tokens: 4000,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.log("OpenAI API error:", errorText);
+        throw new Error(`OpenAI API error: ${errorText}`);
+      }
+
+      const data = await response.json();
+      let generatedContent = data.choices[0].message.content;
+      
+      // POST-PROCESSING: Strip out any scoring metadata that GPT might have included
+      // This prevents scores, analysis, and metadata from appearing in the generated content
+      
+      // Remove scoring sections (common patterns from GPT responses)
+      const scoringPatterns = [
+        /📊\s*(?:UPDATED\s+)?MODERN SEO SCORES?:[\s\S]*?(?=\n\n[A-Z]|\n\n#|$)/gi,
+        /Overall:\s*\d+\/100[\s\S]*?(?=\n\n[A-Z]|\n\n#|$)/gi,
+        /Factor Scores?\s*\(Weighted\):[\s\S]*?(?=\n\n[A-Z]|\n\n#|$)/gi,
+        /\*\*Keywords?:\*\*.*?(?=\n|$)/gi,
+        /Keywords?:.*?(?=\n\n|$)/gi,
+        /\*\*Word Count:\*\*.*?(?=\n|$)/gi,
+        /Word Count:.*?(?=\n\n|$)/gi,
+        /These micro-improvements[\s\S]*?(?=\n\n[A-Z]|\n\n#|$)/gi,
+        /This (?:should|will) (?:help )?achieve.*?higher SEO score.*?(?=\n\n[A-Z]|\n\n#|$)/gi,
+      ];
+      
+      scoringPatterns.forEach(pattern => {
+        generatedContent = generatedContent.replace(pattern, '');
+      });
+      
+      // Clean up any multiple blank lines left after removal
+      generatedContent = generatedContent.replace(/\n{3,}/g, '\n\n').trim();
+      
+      return generatedContent;
+    };
+
+    // Prepare prompt configuration
+    const promptConfig = {
+      targetKeyword,
+      contentType,
+      targetAudience: targetAudience || 'all-ages',
+      writingTone: writingTone || 'professional',
+      framework: framework || 'no-framework',
+      country: country || 'WW',
+      wordCount: wordCountNum,
+      additionalInstructions,
+      inputType,
+      urlContent,
+      seoInsights: seoInsights || undefined,
+      serpData: serpData || undefined
+    };
