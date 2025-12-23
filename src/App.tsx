@@ -12,6 +12,7 @@ import { HowItWorks } from './components/HowItWorks';
 import { Features } from './components/Features';
 import { Privacy } from './components/Privacy';
 import { Terms } from './components/Terms';
+import { Refund } from './components/Refund';
 import { FAQ } from './components/FAQ';
 import { Toaster } from './components/ui/sonner';
 import { 
@@ -22,13 +23,13 @@ import {
 
 function AppContent() {
   const { user, loading } = useAuth();
-  const [currentPage, setCurrentPage] = useState<'home' | 'content' | 'marketing' | 'pricing' | 'how-it-works' | 'features' | 'privacy' | 'terms' | 'faq' | 'signin' | 'signup' | 'dashboard'>('home');
+  const [currentPage, setCurrentPage] = useState<'home' | 'content' | 'marketing' | 'pricing' | 'how-it-works' | 'features' | 'privacy' | 'terms' | 'refund' | 'faq' | 'signin' | 'signup' | 'dashboard'>('home');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // Initialize page from URL hash on mount
   React.useEffect(() => {
     const hash = window.location.hash.slice(1); // Remove the # symbol
-    const validPages = ['home', 'content', 'marketing', 'pricing', 'how-it-works', 'features', 'privacy', 'terms', 'faq', 'signin', 'signup', 'dashboard'];
+    const validPages = ['home', 'content', 'marketing', 'pricing', 'how-it-works', 'features', 'privacy', 'terms', 'refund', 'faq', 'signin', 'signup', 'dashboard'];
     
     if (hash && validPages.includes(hash)) {
       setCurrentPage(hash as typeof currentPage);
@@ -46,7 +47,7 @@ function AppContent() {
   React.useEffect(() => {
     const handleHashChange = () => {
       const hash = window.location.hash.slice(1);
-      const validPages = ['home', 'content', 'marketing', 'pricing', 'how-it-works', 'features', 'privacy', 'terms', 'faq', 'signin', 'signup', 'dashboard'];
+      const validPages = ['home', 'content', 'marketing', 'pricing', 'how-it-works', 'features', 'privacy', 'terms', 'refund', 'faq', 'signin', 'signup', 'dashboard'];
       
       if (hash && validPages.includes(hash)) {
         setCurrentPage(hash as typeof currentPage);
@@ -591,6 +592,13 @@ function AppContent() {
         </section>
       )}
 
+      {/* Refund Page */}
+      {currentPage === 'refund' && (
+        <section className="bg-white min-h-screen">
+          <Refund />
+        </section>
+      )}
+
       {/* FAQ Page */}
       {currentPage === 'faq' && (
         <section className="bg-white min-h-screen">
@@ -630,6 +638,7 @@ function AppContent() {
               <ul className="space-y-2 text-[#ffecd1]">
                 <li><button onClick={() => handlePageChange('privacy')} className="hover:text-[#ff7d00] transition-colors">Privacy Policy</button></li>
                 <li><button onClick={() => handlePageChange('terms')} className="hover:text-[#ff7d00] transition-colors">Terms of Service</button></li>
+                <li><button onClick={() => handlePageChange('refund')} className="hover:text-[#ff7d00] transition-colors">Refund Policy</button></li>
               </ul>
             </div>
           </div>
