@@ -25,11 +25,40 @@ function AppContent() {
   const [currentPage, setCurrentPage] = useState<'home' | 'content' | 'marketing' | 'pricing' | 'how-it-works' | 'features' | 'privacy' | 'terms' | 'faq' | 'signin' | 'signup' | 'dashboard'>('home');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
+  // Initialize page from URL hash on mount
+  React.useEffect(() => {
+    const hash = window.location.hash.slice(1); // Remove the # symbol
+    const validPages = ['home', 'content', 'marketing', 'pricing', 'how-it-works', 'features', 'privacy', 'terms', 'faq', 'signin', 'signup', 'dashboard'];
+    
+    if (hash && validPages.includes(hash)) {
+      setCurrentPage(hash as typeof currentPage);
+    }
+  }, []);
+
   // Scroll to top when page changes
   const handlePageChange = (page: typeof currentPage) => {
     setCurrentPage(page);
+    window.location.hash = page; // Update URL hash
     window.scrollTo(0, 0);
   };
+
+  // Listen for hash changes (browser back/forward buttons)
+  React.useEffect(() => {
+    const handleHashChange = () => {
+      const hash = window.location.hash.slice(1);
+      const validPages = ['home', 'content', 'marketing', 'pricing', 'how-it-works', 'features', 'privacy', 'terms', 'faq', 'signin', 'signup', 'dashboard'];
+      
+      if (hash && validPages.includes(hash)) {
+        setCurrentPage(hash as typeof currentPage);
+        window.scrollTo(0, 0);
+      } else if (!hash) {
+        setCurrentPage('home');
+      }
+    };
+
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, []);
 
   // If user is logged in and on home/signin/signup, redirect to dashboard
   React.useEffect(() => {
